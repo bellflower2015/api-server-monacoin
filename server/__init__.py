@@ -25,12 +25,10 @@ subscribers = {}
 connections = 0
 thread = None
 
-from server import esplora
 from server import routes
 from server import socket
 from server import rest
 
-esplora.init(app)
 routes.init(app)
 socket.init(sio)
 rest.init(app)

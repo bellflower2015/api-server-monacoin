@@ -3,7 +3,7 @@ from server import utils
 class Address():
     @classmethod
     def balance(cls, address: str):
-        return utils.make_request("getaddressbalance", [address])
+        return utils.getaddressbalance(address)
 
     @classmethod
     def mempool(cls, address: str, raw=False):
@@ -31,37 +31,11 @@ class Address():
 
     @classmethod
     def unspent(cls, address: str, amount: int):
-        data = utils.make_request("getaddressutxos", [address, utils.amount(amount)])
-
-        if data["error"] is None:
-            utxos = []
-            for index, utxo in enumerate(data["result"]):
-                utxos.append({
-                    "txid": utxo["txid"],
-                    "index": utxo["outputIndex"],
-                    "script": utxo["script"],
-                    "value": utxo["satoshis"],
-                    "height": utxo["height"]
-                })
-
-            data["result"] = utxos
-
-        return data
+        return utils.getaddressutxos(address, amount)
 
     @classmethod
     def history(cls, address: str):
-        data = utils.make_request("getaddresstxids", [address])
-
-        if data["error"] is None:
-            data["result"] = data["result"][::-1]
-            total = len(data["result"])
-            transactions = data["result"]
-            data.pop("result")
-            data["result"] = {}
-            data["result"]["tx"] = transactions
-            data["result"]["txcount"] = total
-
-        return data
+        return utils.getaddresstxids(address)
 
     @classmethod
     def check(cls, addresses: list):

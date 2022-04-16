@@ -18,29 +18,73 @@ def make_request(method, params=[]):
     except Exception:
         return dead_response()
 
+def getaddressbalance(address: str):
+    headers = {"content-type": "text/plain;"}
+    try:
+        result = requests.get(config.blockbook + 'api/v2/address/' + address, headers=headers).json()
+        return {"error": None, "id": config.rid, "result": {"balance": result['balance'], "received": result['totalReceived']}}
+    except Exception:
+        return dead_response()
+
+def getaddressutxos(address: str, amount: int = -1):
+    headers = {"content-type": "text/plain;"}
+    try:
+        result = requests.get(config.blockbook + 'api/v2/utxo/' + address + '?confirmed=true', headers=headers).json()
+        utxos = []
+        value = 0
+        for utxo in reversed(result):
+            value += int(utxo["value"])
+            tx_data = make_request("getrawtransaction", [utxo["txid"], True])
+            utxos.append({
+                "txid": utxo["txid"],
+                "index": utxo["vout"],
+                "script": tx_data["result"]["vout"][utxo["vout"]]["scriptPubKey"]["hex"],
+                "value": int(utxo["value"]),
+                "height": utxo["height"]
+            })
+            if amount >= 0 and value >= amount:
+                break
+        return {"error": None, "id": config.rid, "result": utxos}
+    except Exception:
+        return dead_response()
+
+def getaddresstxids(address: str):
+    headers = {"content-type": "text/plain;"}
+    try:
+        result = requests.get(config.blockbook + 'api/v2/address/' + address + '?details=txids', headers=headers).json()
+        return {"error": None, "id": config.rid, "result": {"tx": result["txids"], "txcount": len(result["txids"])}}
+    except Exception:
+        return dead_response()
+
 def reward(height):
-    halvings = height // 12500000
+    halvings = height // 1000000
 
     if halvings >= 64:
         return 0
 
-    return int(satoshis(42.94967296) // (2 ** halvings))
+    if height == 1:
+        return int(satoshis(10000000))
+
+    return int(satoshis(10) // (2 ** halvings))
 
 def supply(height):
-    reward = satoshis(42.94967296)
-    halvings = 12500000
+    reward = satoshis(10)
+    halvings = 1000000
     halvings_count = 0
-    supply = reward
+    supply = satoshis(10000000) - reward
 
-    while height > halvings:
-        total = halvings * reward
-        reward = reward / 2
-        height = height - halvings
-        halvings_count += 1
+    if height > 0:
+        while height > halvings:
+            total = halvings * reward
+            reward = reward / 2
+            height = height - halvings
+            halvings_count += 1
 
-        supply += total
+            supply += total
 
-    supply = supply + height * reward
+        supply = supply + height * reward
+    else:
+        supply = 0
 
     return {
         "halvings": int(halvings_count),

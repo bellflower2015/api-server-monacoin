@@ -68,5 +68,5 @@ class General():
     @classmethod
     @cache.memoize(timeout=600)
     def price(cls):
-        link = "https://api.coingecko.com/api/v3/simple/price?ids=sugarchain&vs_currencies=usd,btc"
+        link = "https://api.coingecko.com/api/v3/simple/price?ids=bellcoin&vs_currencies=btc,usd,jpy"
         return requests.get(link).json()
