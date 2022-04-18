@@ -15,7 +15,7 @@ class General():
             data["result"].pop("initialblockdownload")
             data["result"].pop("pruned")
             data["result"].pop("softforks")
-            data["result"].pop("bip9_softforks")
+            #data["result"].pop("bip9_softforks")
             data["result"].pop("warnings")
             data["result"].pop("size_on_disk")
 
@@ -37,20 +37,16 @@ class General():
 
     @classmethod
     def fee(cls):
-        # ToDo: Fix me
-        # https://github.com/sugarchain-project/sugarchain/issues/34
+        data = utils.make_request("estimatesmartfee", [6])
 
-        # data = utils.make_request("estimatesmartfee", [6])
-
-        # if data["error"] is None:
-        #   data["result"]["feerate"] = utils.satoshis(data["result"]["feerate"])
-
-        # return data
-
-        return utils.response({
-            "feerate": utils.satoshis(0.00001),
-            "blocks": 6
-        })
+        if data["error"] is None:
+            data["result"]["feerate"] = utils.satoshis(data["result"]["feerate"])
+            return data
+        else:
+            return utils.response({
+                "feerate": utils.satoshis(0.0002),
+                "blocks": 6
+            })
 
     @classmethod
     def mempool(cls):
@@ -68,5 +64,5 @@ class General():
     @classmethod
     @cache.memoize(timeout=600)
     def price(cls):
-        link = "https://api.coingecko.com/api/v3/simple/price?ids=bellcoin&vs_currencies=btc,usd,jpy"
+        link = "https://api.coingecko.com/api/v3/simple/price?ids=monacoin&vs_currencies=btc,usd,jpy"
         return requests.get(link).json()

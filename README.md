@@ -1,6 +1,6 @@
 # Getting started
 
-This is RESTful API which will allow you to interact with Bellcoin blockchain.
+This is RESTful API which will allow you to interact with Monacoin blockchain.
 
 # How to use it?
 
@@ -29,7 +29,7 @@ $ pip3 install -r requirements.txt
 $ python3 app.py
 ```
 
-All request should be send to this endpoint: `https://api.bellcoin.web4u.jp/`
+All request should be send to this endpoint: `https://api.monacoin.web4u.jp/`
 
 Responce have following fields:
 

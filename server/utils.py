@@ -57,21 +57,18 @@ def getaddresstxids(address: str):
         return dead_response()
 
 def reward(height):
-    halvings = height // 1000000
+    halvings = height // 1051200
 
     if halvings >= 64:
         return 0
 
-    if height == 1:
-        return int(satoshis(10000000))
-
-    return int(satoshis(10) // (2 ** halvings))
+    return int(satoshis(50) // (2 ** halvings))
 
 def supply(height):
-    reward = satoshis(10)
-    halvings = 1000000
+    reward = satoshis(50)
+    halvings = 1051200
     halvings_count = 0
-    supply = satoshis(10000000) - reward
+    supply = reward
 
     if height > 0:
         while height > halvings:
